@@ -1,11 +1,21 @@
 # Retailer-Store
 
+Technologies used:
 The project has been created using Java 17 and springboot version 3.5.6
 
 The project makes use of Lombok.
 
 It calculates the reward points, and stores separately for each month corresponding to it’s user id. Also, the cumulative points are stored for each customer. 
 P.S. : Just some sample data has been provided (added in helper class), though the project can be modified further if the need arises.
+
+Steps to run application:
+	Pre requisite:
+			1)Any Java supported IDE.
+			2)Lombok installed for that IDE.
+Steps:
+1. Import the project to your IDE as a maven project.
+2. Perform maven clean/update.
+3. Start the application by running java class "RewardsApplication.java" as a java application.
 
 Details about the project module:
 
@@ -25,15 +35,6 @@ Endpoint included:
 
 GET Request : http://localhost:8080/calculateReward
 /calculateReward - It accepts the list of transaction and returns the list of Customer along with the credit points earned in the last three months based on the amount spent, mentioned beside their corresponding month.
-
-Steps to run application:
-	Pre requisite:
-			1)Any Java supported IDE.
-			2)Lombok installed for that IDE.
-Steps:
-1. Import the project to your IDE as a maven project.
-2. Perform maven clean/update.
-3. Start the application by running java class "RewardsApplication.java" as a java application.
 
 
 Request/Response:
