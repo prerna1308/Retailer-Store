@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
 
+import com.retailer.rewards.dto.TransactionDTO;
 import com.retailer.rewards.entity.CustomerReward;
 import com.retailer.rewards.entity.Transaction;
 import com.retailer.rewards.helper.RewardsHelper;
@@ -17,9 +18,9 @@ import com.retailer.rewards.helper.RewardsHelper;
 public class RewardServiceImpl implements RewardService {
 
 	@Override
-	public List<CustomerReward> calculateReward() {
+	public List<CustomerReward> calculateReward(List<TransactionDTO> transDTOList) {
 		Map<Integer, Map<String, Integer>> custResponseMap = new ConcurrentHashMap<Integer, Map<String, Integer>>();
-		for (Transaction trans : RewardsHelper.getTransactionList()) {
+		for (Transaction trans : RewardsHelper.convertToTransObj(transDTOList)) {
 			int keyVal = trans.getCustId();
 			Map<String, Integer> rewardMap = new ConcurrentHashMap<String, Integer>();
 			if (custResponseMap.containsKey(keyVal)) {
@@ -60,12 +61,10 @@ public class RewardServiceImpl implements RewardService {
 				pointVal = RewardsHelper.calculatePointValue(amount);
 			}
 			custMapVal.put(month, pointVal);
-			System.out.println("custMapVal: " + custMapVal);
 			return custMapVal;
 		} else {
 			Map<String, Integer> rewardMap = new HashMap<String, Integer>();
 			rewardMap.put(month, RewardsHelper.calculatePointValue(amount));
-			System.out.println("rewardMap: " + rewardMap);
 			return rewardMap;
 		}
 	}

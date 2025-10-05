@@ -1,29 +1,14 @@
 package com.retailer.rewards.helper;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.retailer.rewards.dto.TransactionDTO;
 import com.retailer.rewards.entity.Transaction;
 
 public class RewardsHelper {
-
-	public static List<Transaction> getTransactionList() {
-		List<Transaction> transList = new ArrayList<Transaction>();
-		transList.add(new Transaction(123, 78, LocalDateTime.now()));
-		transList.add(new Transaction(103, 314, LocalDateTime.now()));
-		transList.add(new Transaction(234, 78, LocalDateTime.now()));
-		transList.add(new Transaction(123, 74, LocalDateTime.parse("2025-08-19T10:27:27.267357787")));
-		transList.add(new Transaction(123, 214, LocalDateTime.parse("2025-08-19T10:27:27.267357787")));
-		transList.add(new Transaction(123, 180, LocalDateTime.parse("2025-07-19T10:27:27.267357787")));
-		transList.add(new Transaction(123, 138, LocalDateTime.parse("2025-08-19T10:27:27.267357787")));
-		transList.add(new Transaction(116, 125, LocalDateTime.parse("2025-08-19T10:27:27.267357787")));
-		transList.add(new Transaction(103, 130, LocalDateTime.parse("2025-08-19T10:27:27.267357787")));
-		transList.add(new Transaction(116, 98, LocalDateTime.parse("2025-08-19T10:27:27.267357787")));
-		transList.add(new Transaction(116, 200, LocalDateTime.parse("2025-08-19T10:27:27.267357787")));
-		transList.add(new Transaction(113, 400, LocalDateTime.parse("2025-08-19T10:27:27.267357787")));
-		return transList;
-	}
 
 	public static int calculatePointValue(int reward) {
 		int point = 0;
@@ -33,6 +18,24 @@ public class RewardsHelper {
 		} else if (reward > 50)
 			point += (reward - 50);
 		return point;
+	}
+
+	public static LocalDateTime convertStringToLocalDateTime(String dateStr) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+		LocalDateTime dateTime = LocalDateTime.parse(dateStr, formatter);
+		return dateTime;
+	}
+
+	public static List<Transaction> convertToTransObj(List<TransactionDTO> transDTOList) {
+		List<Transaction> transList = new ArrayList<Transaction>();
+		for (TransactionDTO transDTO : transDTOList) {
+			Transaction transaction = new Transaction();
+			transaction.setCustId(transDTO.getCustId());
+			transaction.setAmount(transDTO.getAmount());
+			transaction.setCreationDate(convertStringToLocalDateTime(transDTO.getCreationDate()));
+			transList.add(transaction);
+		}
+		return transList;
 	}
 
 }
