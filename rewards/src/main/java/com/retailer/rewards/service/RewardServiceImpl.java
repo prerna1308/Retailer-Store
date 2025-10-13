@@ -1,5 +1,6 @@
 package com.retailer.rewards.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +18,13 @@ import com.retailer.rewards.helper.RewardsHelper;
 @Service
 public class RewardServiceImpl implements RewardService {
 
+	/**
+	 * This method calculates the Reward for each Customer individually over the
+	 * last 3 months
+	 * 
+	 * @param transList
+	 * @return CustomerReward list
+	 */
 	@Override
 	public List<CustomerReward> calculateReward(List<TransactionDTO> transDTOList) {
 		Map<Integer, Map<String, Integer>> custResponseMap = new ConcurrentHashMap<Integer, Map<String, Integer>>();
@@ -34,6 +42,13 @@ public class RewardServiceImpl implements RewardService {
 		return createCustRewardResponse(custResponseMap);
 	}
 
+	/**
+	 * This method converts the given customer Response Map to a list for
+	 * CustomerRewrd object list
+	 * 
+	 * @param custResponseMap
+	 * @return CustomerReward list
+	 */
 	private List<CustomerReward> createCustRewardResponse(Map<Integer, Map<String, Integer>> custResponseMap) {
 		List<CustomerReward> customerRewardList = new ArrayList<CustomerReward>();
 		for (Map.Entry<Integer, Map<String, Integer>> entry : custResponseMap.entrySet()) {
@@ -50,23 +65,35 @@ public class RewardServiceImpl implements RewardService {
 		return customerRewardList;
 	}
 
+	/**
+	 * This method calculates the point for each month, mapped corresponding to
+	 * their month
+	 * 
+	 * @param amount
+	 * @param localDateTime
+	 * @param custMapVal
+	 * @return rewardsPointMap
+	 */
 	private Map<String, Integer> getRewardPoint(int amount, LocalDateTime localDateTime,
 			Map<String, Integer> custMapVal) {
 		String month = String.valueOf(localDateTime.getMonth());
-		if (custMapVal != null) {
-			int pointVal = 0;
-			if (custMapVal.containsKey(String.valueOf(localDateTime.getMonth()))) {
-				pointVal = custMapVal.get(month) + RewardsHelper.calculatePointValue(amount);
+		if (RewardsHelper.getLastThreeMonthList(LocalDate.now()).contains(localDateTime.getMonth())) {
+			if (custMapVal != null) {
+				int pointVal = 0;
+				if (custMapVal.containsKey(String.valueOf(localDateTime.getMonth()))) {
+					pointVal = custMapVal.get(month) + RewardsHelper.calculatePointValue(amount);
+				} else {
+					pointVal = RewardsHelper.calculatePointValue(amount);
+				}
+				custMapVal.put(month, pointVal);
+				return custMapVal;
 			} else {
-				pointVal = RewardsHelper.calculatePointValue(amount);
+				Map<String, Integer> rewardMap = new HashMap<String, Integer>();
+				rewardMap.put(month, RewardsHelper.calculatePointValue(amount));
+				return rewardMap;
 			}
-			custMapVal.put(month, pointVal);
-			return custMapVal;
-		} else {
-			Map<String, Integer> rewardMap = new HashMap<String, Integer>();
-			rewardMap.put(month, RewardsHelper.calculatePointValue(amount));
-			return rewardMap;
-		}
+		} else
+			return new HashMap<String, Integer>();
 	}
 
 }
