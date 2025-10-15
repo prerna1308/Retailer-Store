@@ -40,80 +40,89 @@ GET Request : http://localhost:8080/calculateReward
 Request/Response:
 Request:
 - Request provided is a list of trsancation. The form for which is as following:
-NOTE: 1) Currently the creationDate only accepts the date time of format.
+NOTE: 1) Currently the creationDate only accepts the date of format dd/MM/yyyy.
 	2) Time accepted is currently 24 hour format.
 [
-	{
-		"custId" : 123,
-		"amount" : 78,
-		"creationDate" : "13/08/2025 13:09"
-	},
-	{
-		"custId" : 103,
-		"amount" : 150,
-		"creationDate" : "13/07/2025 20:00"
-	},
-	{
-		"custId" : 123,
-		"amount" : 95,
-		"creationDate" : "07/07/2025 08:49"
-	},
-	{
-		"custId" : 123,
-		"amount" : 80,
-		"creationDate" : "23/07/2025 12:30"
-	},
-	{
-		"custId" : 103,
-		"amount" : 100,
-		"creationDate" : "08/08/2025 01:38"
-	},
-	{
-		"custId" : 103,
-		"amount" : 200,
-		"creationDate" : "22/07/2025 19:20"
-	},
-	{
-		"custId" : 123,
-		"amount" : 50,
-		"creationDate" : "13/09/2025 16:46"
-	},
-	{
-		"custId" : 123,
-		"amount" : 150,
-		"creationDate" : "13/09/2025 06:00"
-	},
-	{
-		"custId" : 123,
-		"amount" : 54,
-		"creationDate" : "13/08/2025 19:58"
-	},
-	{
-		"custId" : 122,
-		"amount" : 67,
-		"creationDate" : "13/08/2025 09:19"
-	},
-	{
-		"custId" : 103,
-		"amount" : 83,
-		"creationDate" : "04/09/2025 22:03"
-	},
-	{
-		"custId" : 103,
-		"amount" : 290,
-		"creationDate" : "17/09/2025 04:33"
-	},
-	{
-		"custId" : 122,
-		"amount" : 400,
-		"creationDate" : "13/07/2025 14:47"
-	},
-	{
-		"custId" : 122,
-		"amount" :47,
-		"creationDate" : "13/09/2025 05:29"
-	}
-	
+  {
+    "custId": 123,
+    "custName": "abc",
+    "startDate": "07/07/2025",
+    "endDate": "13/09/2025",
+    "transactions": [
+      {
+        "amount": 78,
+        "creationDate": "13/08/2025"
+      },
+      {
+        "amount": 95,
+        "creationDate": "07/07/2025"
+      },
+      {
+        "amount": 80,
+        "creationDate": "23/07/2025"
+      },
+      {
+        "amount": 50,
+        "creationDate": "13/09/2025"
+      },
+      {
+        "amount": 150,
+        "creationDate": "13/09/2025"
+      },
+      {
+        "amount": 54,
+        "creationDate": "13/08/2025"
+      }
+    ]
+  },
+  {
+    "custId": 103,
+    "custName": "cde",
+    "startDate": "13/07/2025",
+    "endDate": "17/09/2025",
+    "transactions": [
+      {
+        "amount": 150,
+        "creationDate": "13/07/2025"
+      },
+      {
+        "amount": 100,
+        "creationDate": "08/08/2025"
+      },
+      {
+        "amount": 200,
+        "creationDate": "22/07/2025"
+      },
+      {
+        "amount": 83,
+        "creationDate": "04/09/2025"
+      },
+      {
+        "amount": 290,
+        "creationDate": "17/09/2025"
+      }
+    ]
+  },
+  {
+    "custId": 122,
+    "custName": "def",
+    "startDate": "13/07/2025",
+    "endDate": "13/11/2025",
+    "transactions": [
+      {
+        "amount": 67,
+        "creationDate": "13/08/2025"
+      },
+      {
+        "amount": 400,
+        "creationDate": "13/07/2025"
+      },
+      {
+        "amount": 47,
+        "creationDate": "13/09/2025"
+      }
+    ]
+  }
 ]
 
 Response received:
@@ -126,15 +135,6 @@ Response received:
             "SEPTEMBER": 463
         },
         "totalPoints": 913
-    },
-    {
-        "custId": 122,
-        "rewardPoints": {
-            "AUGUST": 17,
-            "JULY": 650,
-            "SEPTEMBER": 0
-        },
-        "totalPoints": 667
     },
     {
         "custId": 123,
