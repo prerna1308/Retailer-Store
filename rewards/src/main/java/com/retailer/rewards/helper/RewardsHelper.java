@@ -1,13 +1,15 @@
 package com.retailer.rewards.helper;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Month;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.retailer.rewards.dto.CustomerDTO;
 import com.retailer.rewards.dto.TransactionDTO;
+import com.retailer.rewards.entity.Customer;
 import com.retailer.rewards.entity.Transaction;
 
 public class RewardsHelper {
@@ -34,42 +36,53 @@ public class RewardsHelper {
 	 * @param dateStr
 	 * @return dateTime
 	 */
-	public static LocalDateTime convertStringToLocalDateTime(String dateStr) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-		LocalDateTime dateTime = LocalDateTime.parse(dateStr, formatter);
-		return dateTime;
+	public static LocalDate convertStringToLocalDateTime(String dateStr) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		LocalDate dateVal = LocalDate.parse(dateStr, formatter);
+		return dateVal;
 	}
 
 	/**
 	 * It converts Transaction DTO object to Transaction DAO object
 	 * 
-	 * @param transDTOList
+	 * @param custDTOList
 	 * @return transList
 	 */
-	public static List<Transaction> convertToTransObj(List<TransactionDTO> transDTOList) {
-		List<Transaction> transList = new ArrayList<Transaction>();
-		for (TransactionDTO transDTO : transDTOList) {
-			Transaction transaction = new Transaction();
-			transaction.setCustId(transDTO.getCustId());
-			transaction.setAmount(transDTO.getAmount());
-			transaction.setCreationDate(convertStringToLocalDateTime(transDTO.getCreationDate()));
-			transList.add(transaction);
+	public static List<Customer> convertToCustomerObj(List<CustomerDTO> custDTOList) {
+		List<Customer> custList = new ArrayList<Customer>();
+		for (CustomerDTO customerDTO : custDTOList) {
+			Customer customer = new Customer();
+			customer.setCustId(customerDTO.getCustId());
+			customer.setStartDate(convertStringToLocalDateTime(customerDTO.getStartDate()));
+			customer.setEndDate(convertStringToLocalDateTime(customerDTO.getEndDate()));
+			customer.setCustName(customerDTO.getCustName());
+			List<Transaction> transList = new ArrayList<Transaction>();
+			for (TransactionDTO transDTO : customerDTO.getTransactions()) {
+				Transaction transaction = new Transaction();
+				transaction.setAmount(transDTO.getAmount());
+				transaction.setCreationDate(convertStringToLocalDateTime(transDTO.getCreationDate()));
+				transList.add(transaction);
+			}
+			customer.setTransList(transList);
+			custList.add(customer);
 		}
-		return transList;
+		return custList;
 	}
 
 	/**
-	 * It returns the list of last three months, calculated from current date
+	 * It checks if the given start date and end date fall in the consecutive three
+	 * months
 	 * 
-	 * @param currentDate
+	 * @param startDate
+	 * @param endDate
 	 * @return
 	 */
-	public static List<Month> getLastThreeMonthList(LocalDate currentDate) {
-		List<Month> lastThreeMonth = new ArrayList<Month>();
-		lastThreeMonth.add(currentDate.getMonth());
-		lastThreeMonth.add(currentDate.minusMonths(1).getMonth());
-		lastThreeMonth.add(currentDate.minusMonths(2).getMonth());
-		return lastThreeMonth;
+	public static boolean checkIfMonthsAreConsecutive(LocalDate startDate, LocalDate endDate) {
+		YearMonth startMonth = YearMonth.from(startDate);
+		YearMonth endMonth = YearMonth.from(endDate);
+		long monthsBetween = ChronoUnit.MONTHS.between(startMonth, endMonth) + 1;
+		boolean isThreeConsecutiveMonths = monthsBetween == 3;
+		return isThreeConsecutiveMonths;
 	}
 
 }

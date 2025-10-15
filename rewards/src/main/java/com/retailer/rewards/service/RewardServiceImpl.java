@@ -1,7 +1,6 @@
 package com.retailer.rewards.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
 
-import com.retailer.rewards.dto.TransactionDTO;
+import com.retailer.rewards.dto.CustomerDTO;
+import com.retailer.rewards.entity.Customer;
 import com.retailer.rewards.entity.CustomerReward;
 import com.retailer.rewards.entity.Transaction;
 import com.retailer.rewards.helper.RewardsHelper;
@@ -20,24 +20,33 @@ public class RewardServiceImpl implements RewardService {
 
 	/**
 	 * This method calculates the Reward for each Customer individually over the
-	 * last 3 months
+	 * given 3 months
 	 * 
 	 * @param transList
 	 * @return CustomerReward list
 	 */
 	@Override
-	public List<CustomerReward> calculateReward(List<TransactionDTO> transDTOList) {
+	public List<CustomerReward> calculateReward(List<CustomerDTO> custDTOList) {
 		Map<Integer, Map<String, Integer>> custResponseMap = new ConcurrentHashMap<Integer, Map<String, Integer>>();
-		for (Transaction trans : RewardsHelper.convertToTransObj(transDTOList)) {
-			int keyVal = trans.getCustId();
-			Map<String, Integer> rewardMap = new ConcurrentHashMap<String, Integer>();
-			if (custResponseMap.containsKey(keyVal)) {
-				rewardMap = getRewardPoint((int) trans.getAmount(), trans.getCreationDate(),
-						custResponseMap.get(trans.getCustId()));
+
+		for (Customer customer : RewardsHelper.convertToCustomerObj(custDTOList)) {
+			if (RewardsHelper.checkIfMonthsAreConsecutive(customer.getStartDate(), customer.getEndDate())) {
+				for (Transaction trans : customer.getTransList()) {
+					int keyVal = customer.getCustId();
+					Map<String, Integer> rewardMap = new ConcurrentHashMap<String, Integer>();
+					if (custResponseMap.containsKey(keyVal)) {
+						rewardMap = getRewardPoint((int) trans.getAmount(), trans.getCreationDate(),
+								custResponseMap.get(customer.getCustId()));
+					} else {
+						rewardMap = getRewardPoint((int) trans.getAmount(), trans.getCreationDate(), null);
+					}
+					custResponseMap.put(keyVal, rewardMap);
+				}
 			} else {
-				rewardMap = getRewardPoint((int) trans.getAmount(), trans.getCreationDate(), null);
+				System.out.println(
+						"Customer " + customer.getCustName() + " start and end dates are not from consecutive 3 months.");
 			}
-			custResponseMap.put(keyVal, rewardMap);
+
 		}
 		return createCustRewardResponse(custResponseMap);
 	}
@@ -70,30 +79,26 @@ public class RewardServiceImpl implements RewardService {
 	 * their month
 	 * 
 	 * @param amount
-	 * @param localDateTime
+	 * @param localDate
 	 * @param custMapVal
 	 * @return rewardsPointMap
 	 */
-	private Map<String, Integer> getRewardPoint(int amount, LocalDateTime localDateTime,
-			Map<String, Integer> custMapVal) {
-		String month = String.valueOf(localDateTime.getMonth());
-		if (RewardsHelper.getLastThreeMonthList(LocalDate.now()).contains(localDateTime.getMonth())) {
-			if (custMapVal != null) {
-				int pointVal = 0;
-				if (custMapVal.containsKey(String.valueOf(localDateTime.getMonth()))) {
-					pointVal = custMapVal.get(month) + RewardsHelper.calculatePointValue(amount);
-				} else {
-					pointVal = RewardsHelper.calculatePointValue(amount);
-				}
-				custMapVal.put(month, pointVal);
-				return custMapVal;
+	private Map<String, Integer> getRewardPoint(int amount, LocalDate localDate, Map<String, Integer> custMapVal) {
+		String month = String.valueOf(localDate.getMonth());
+		if (custMapVal != null) {
+			int pointVal = 0;
+			if (custMapVal.containsKey(String.valueOf(localDate.getMonth()))) {
+				pointVal = custMapVal.get(month) + RewardsHelper.calculatePointValue(amount);
 			} else {
-				Map<String, Integer> rewardMap = new HashMap<String, Integer>();
-				rewardMap.put(month, RewardsHelper.calculatePointValue(amount));
-				return rewardMap;
+				pointVal = RewardsHelper.calculatePointValue(amount);
 			}
-		} else
-			return new HashMap<String, Integer>();
+			custMapVal.put(month, pointVal);
+			return custMapVal;
+		} else {
+			Map<String, Integer> rewardMap = new HashMap<String, Integer>();
+			rewardMap.put(month, RewardsHelper.calculatePointValue(amount));
+			return rewardMap;
+		}
 	}
 
 }

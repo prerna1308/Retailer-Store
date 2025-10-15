@@ -1,14 +1,13 @@
 package com.retailer.rewards.entity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.Data;
 
 @Data
 public class Transaction {
 
-	private int custId;
 	private double amount;
-	private LocalDateTime creationDate;
+	private LocalDate creationDate;
 
 }

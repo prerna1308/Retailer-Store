@@ -8,10 +8,6 @@ import lombok.Data;
 public class TransactionDTO {
 
 	@Valid
-	@NotNull(message = "Id is required")
-	private Integer custId;
-
-	@Valid
 	@NotNull(message = "Amount is required")
 	private Double amount;
 

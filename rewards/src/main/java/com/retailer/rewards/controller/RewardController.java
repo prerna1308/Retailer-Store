@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.retailer.rewards.dto.TransactionDTO;
+import com.retailer.rewards.dto.CustomerDTO;
 import com.retailer.rewards.entity.CustomerReward;
 import com.retailer.rewards.service.RewardService;
 
@@ -25,12 +25,12 @@ public class RewardController {
 	 * This method calculates points earned by Customer for last three months from
 	 * given Transaction list provided for each Customer
 	 * 
-	 * @param transList
+	 * @param custList
 	 * @return CustomerReward list
 	 */
 	@PostMapping("/calculateReward")
-	private ResponseEntity<List<CustomerReward>> calculateReward(@Valid @RequestBody List<TransactionDTO> transList) {
-		return new ResponseEntity<List<CustomerReward>>(rewardService.calculateReward(transList), HttpStatus.OK);
+	private ResponseEntity<List<CustomerReward>> calculateReward(@Valid @RequestBody List<CustomerDTO> custList) {
+		return new ResponseEntity<List<CustomerReward>>(rewardService.calculateReward(custList), HttpStatus.OK);
 	}
 
 }

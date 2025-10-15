@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.retailer.rewards.controller.RewardController;
+import com.retailer.rewards.dto.CustomerDTO;
 import com.retailer.rewards.dto.TransactionDTO;
 import com.retailer.rewards.entity.CustomerReward;
 import com.retailer.rewards.service.RewardService;
@@ -37,15 +39,28 @@ public class RewardsControllerTest {
 
 	/**
 	 * This method provides valid request to test the fuctionality
+	 * 
 	 * @throws Exception
 	 */
 	@Test
 	void testValidTransactionListReturnsRewards() throws Exception {
 		// Given: valid request
+		List<CustomerDTO> custDTOList = new ArrayList<CustomerDTO>();
+		CustomerDTO customerDTO = new CustomerDTO();
+		customerDTO.setCustId(101);
+		customerDTO.setCustName("ABCD");
+		customerDTO.setStartDate("15/06/2025");
+		customerDTO.setEndDate("06/08/2025");
+		List<TransactionDTO> transDTOList = new ArrayList<TransactionDTO>();
+
 		TransactionDTO tx1 = new TransactionDTO();
-		tx1.setCustId(101);
 		tx1.setAmount(120.0);
 		tx1.setCreationDate("2025-09-01");
+
+		transDTOList.add(tx1);
+		customerDTO.setTransactions(transDTOList);
+
+		custDTOList.add(customerDTO);
 
 		CustomerReward reward = new CustomerReward();
 		reward.setCustId(101);
@@ -57,28 +72,34 @@ public class RewardsControllerTest {
 		rewardPoints.put("September", 21);
 		reward.setRewardPoints(rewardPoints);
 
-		when(rewardService.calculateReward(List.of(tx1))).thenReturn(List.of(reward));
+		when(rewardService.calculateReward(custDTOList)).thenReturn(List.of(reward));
 
 		mockMvc.perform(post("/calculateReward").contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(List.of(tx1)))).andExpect(status().isOk())
+				.content(objectMapper.writeValueAsString(List.of(customerDTO)))).andExpect(status().isOk())
 				.andExpect(jsonPath("$[0].customerId").value(101))
 				.andExpect(jsonPath("$[0].totalRewardPoints").value(45));
 	}
 
 	/**
 	 * This method provides creation date as null to test neative case
+	 * 
 	 * @throws Exception
 	 */
 	@Test
 	void testInvalidTransactionListReturnsBadRequest() throws Exception {
 		// Given: missing creationDate
+		CustomerDTO customerDTO = new CustomerDTO();
+		customerDTO.setCustId(45);
+		customerDTO.setEndDate("13/09/2025");
+
 		TransactionDTO tx = new TransactionDTO();
-		tx.setCustId(102);
 		tx.setAmount(100.0);
 		tx.setCreationDate(null); // invalid
 
+		customerDTO.setTransactions(List.of(tx));
+
 		mockMvc.perform(post("/calculateReward").contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(List.of(tx)))).andExpect(status().isBadRequest())
+				.content(objectMapper.writeValueAsString(List.of(customerDTO)))).andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("creationDate")));
 	}
 
